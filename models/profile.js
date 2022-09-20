@@ -1,0 +1,58 @@
+const {Schema, model} = require('mongoose');
+
+const ProfileSchema = Schema({
+    control:{
+        type: String,
+        required: true
+    },
+    nombre: {
+        type: String,
+        required: true
+     },
+     apellido: {
+        type: String,
+        required: true
+     },
+     sexo: {
+        type: String,
+        required: true
+     },
+     fecha_nacimiento: {
+        type: Date,
+        required: true
+     },
+     ingreso: {
+        type: {
+            anio: {
+                type: String
+            }, 
+            mes: {
+                type: String
+            }
+        }
+     },
+     egreso: {
+        type: {
+            anio: {
+                type: String
+            }, 
+            mes: {
+                type: String
+            }
+        }
+     },
+     carrera: {
+        type: String,
+        required: true
+     }
+
+
+});
+
+
+ProfileSchema.method('toJSON', function(){
+    const { __v,  ...object } = this.toObject();
+    return object;
+});
+
+module.exports = model('Profile', ProfileSchema);
