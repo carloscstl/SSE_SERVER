@@ -1,58 +1,55 @@
-const {Schema, model} = require('mongoose');
+const { Schema, model } = require("mongoose");
 
 const ProfileSchema = Schema({
-    control:{
+  control: {
+    type: String,
+    required: true,
+  },
+  nombre: {
+    type: String,
+    required: true,
+  },
+  apellido: {
+    type: String,
+    required: true,
+  },
+  sexo: {
+    type: String,
+    required: true,
+  },
+  fecha_nacimiento: {
+    type: Date,
+    required: true,
+  },
+  ingreso: {
+    type: {
+      anio: {
         type: String,
-        required: true
+      },
+      mes: {
+        type: String,
+      },
     },
-    nombre: {
+  },
+  egreso: {
+    type: {
+      anio: {
         type: String,
-        required: true
-     },
-     apellido: {
+      },
+      mes: {
         type: String,
-        required: true
-     },
-     sexo: {
-        type: String,
-        required: true
-     },
-     fecha_nacimiento: {
-        type: Date,
-        required: true
-     },
-     ingreso: {
-        type: {
-            anio: {
-                type: String
-            }, 
-            mes: {
-                type: String
-            }
-        }
-     },
-     egreso: {
-        type: {
-            anio: {
-                type: String
-            }, 
-            mes: {
-                type: String
-            }
-        }
-     },
-     carrera: {
-        type: String,
-        required: true
-     }
-
-
+      },
+    },
+  },
+  isActive:{
+    type:Boolean,
+    default: false
+  }
 });
 
-
-ProfileSchema.method('toJSON', function(){
-    const { __v,  ...object } = this.toObject();
-    return object;
+ProfileSchema.method("toJSON", function () {
+  const { __v, ...object } = this.toObject();
+  return object;
 });
 
-module.exports = model('Profile', ProfileSchema);
+module.exports = model("Profile", ProfileSchema);

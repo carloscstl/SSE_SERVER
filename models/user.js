@@ -1,12 +1,6 @@
 const {Schema, model} = require('mongoose');
 
 const UserSchema = Schema({
-    role: {
-        type: Schema.Types.ObjectId,
-        ref: 'UserRole',
-        required: true,
-        default: '63079e04d41eaef542bbfb5a'
-    },
     name: {
         type: String,
         required: true
@@ -23,15 +17,24 @@ const UserSchema = Schema({
         type: String,
         default: 'no-image.jpg' 
     },
-    profileActivated: {
-        type: Boolean,
-        default: false
-    },
-    profile: {
-        type: Schema.Types.ObjectId,
-        ref: 'Profile'
+    permissions: {
+        write:{
+            type:Boolean,
+            default:false
+        },
+        read:{
+            type:Boolean,
+            default:false
+        },
+        update:{
+            type:Boolean,
+            default:false
+        },
+        delete:{
+            type:Boolean,
+            default:false
+        }
     }
-
 });
 
 UserSchema.method('toJSON', function(){
