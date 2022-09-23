@@ -1,6 +1,5 @@
 const bcrypt = require("bcrypt");
 const { response } = require("express");
-const UserRole = require("../models/user_role");
 const User = require("../models/user");
 const Profile = require("../models/profile");
 
@@ -18,7 +17,7 @@ const createUser = async (req, res) => {
       });
     }
 
-    const user = new User({ name , username, password, permissions});
+    const user = new User({ name, username, password, permissions });
 
     const salt = bcrypt.genSaltSync();
     user.password = bcrypt.hashSync(password, salt);
@@ -26,11 +25,10 @@ const createUser = async (req, res) => {
     await user.save();
 
     res.json({
-      status:true,
-      msg:'User Created Succesfully',
-      user
+      status: true,
+      msg: "User Created Succesfully",
+      user,
     });
-
   } catch (error) {
     res.status(500).json({
       status: false,
@@ -42,33 +40,20 @@ const createUser = async (req, res) => {
 // *REGISTER PROFILE
 
 const registerProfile = async (req, res) => {
-  const {
-    username,
-    nombre,
-    apellido_Paterno,
-    apellido_Materno,
-    sexo,
-    fecha_nacimiento,
-    ...data
-  } = req.body;
+  const { username, ...rest } = req.body;
 
   const existProfile = await Profile.findOne({ control: username });
 
   if (existProfile) {
     return res.status(400).json({
       status: false,
-      msg: "Profile Already Registered",
+      msg: `Profile ${username} already Exists`,
     });
   }
 
   const profile = new Profile({
     control: username,
-    nombre,
-    apellido_Paterno,
-    apellido_Materno,
-    sexo,
-    fecha_nacimiento,
-    ...data,
+    ...rest,
   });
 
   await profile.save();
@@ -158,23 +143,20 @@ const getUser = async (req, res) => {
 
 const getProfile = async (req, res) => {
   try {
+    const { control } = req.params;
+    const profile = await Profile.findOne({ control });
 
-    const {control} = req.params;
-    const profile = await Profile.findOne({control});
-
-    if(!profile){
+    if (!profile) {
       return res.status(404).json({
         status: false,
-        msg:'Profile Not Found'
+        msg: "Profile Not Found",
       });
     }
 
     res.json({
-      status:true,
-      profile
+      status: true,
+      profile,
     });
-    
-    
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -219,6 +201,22 @@ const getUsersByRole = async (req, res) => {
   }
 };
 
+const getProfilesByCareer = async (req, res) => {
+  const { carrera } = req.params;
+
+  const profiles = await Profile.find({ carrera, isActive: true });
+
+  if (!profiles) {
+    return res.status(404).json({
+      status: false,
+      msg: "Profiles Not Founded",
+      carrera,
+    });
+  }
+
+  res.json({ profiles });
+};
+
 const updateProfile = async (req, res) => {
   //TODO: FIX!!!
   console.log("REQUEST: " + req.body.id);
@@ -258,8 +256,9 @@ module.exports = {
   registerProfile,
 
   getUser,
-  getProfile,
   getUsersByRole,
+  getProfile,
+  getProfilesByCareer,
 
   updateProfile,
 };

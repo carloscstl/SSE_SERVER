@@ -9,6 +9,7 @@ const {
   getProfile,
   getUsersByRole,
   updateProfile,
+  getProfilesByCareer,
 } = require("../controllers/users.controller");
 const { validateAdmin } = require("../middleware/data-validation.middleware");
 const { validateFields } = require("../middleware/validate-fields.middleware");
@@ -38,7 +39,10 @@ router.post(
 router.post(
   "/register_profile",
   [
-    check("username", "Username is required.").not().isEmpty(),
+    check("username", "Username is required.")
+      .not()
+      .isEmpty()
+      .isLength({ min: 6, max: 8 }),
     check("nombre", "Nombre is required.").not().isEmpty(),
     check("apellido_Paterno", "Apellido Paterno is required.").not().isEmpty(),
     check("apellido_Materno", "Apellido Materno is required.").not().isEmpty(),
@@ -46,6 +50,7 @@ router.post(
     check("fecha_nacimiento", "Fecha de Nacimiento is required.")
       .not()
       .isEmpty(),
+    check("carrera", "Carrera is required.").not().isEmpty(),
     validateFields,
   ],
   registerProfile
@@ -69,6 +74,8 @@ router.post(
 );
 
 router.get("/profile/:control", getProfile);
+
+router.get("/profiles/:carrera", getProfilesByCareer);
 
 router.get("/:user", getUser);
 

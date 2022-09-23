@@ -1,5 +1,4 @@
 const User = require("../models/user");
-const UserRole = require('../models/user_role');
 const path = require('path')
 
 

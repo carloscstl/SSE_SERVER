@@ -25,6 +25,10 @@ const ProfileSchema = Schema({
     type: Date,
     required: true,
   },
+  carrera:{
+    type:String,
+    required: true
+  },
   ingreso: {
     type: {
       anio: {
