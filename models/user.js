@@ -17,24 +17,9 @@ const UserSchema = Schema({
         type: String,
         default: 'no-image.jpg' 
     },
-    permissions: {
-        write:{
-            type:Boolean,
-            default:false
-        },
-        read:{
-            type:Boolean,
-            default:false
-        },
-        update:{
-            type:Boolean,
-            default:false
-        },
-        delete:{
-            type:Boolean,
-            default:false
-        }
-    }
+    permissions:[{
+        type:String
+    }]
 });
 
 UserSchema.method('toJSON', function(){

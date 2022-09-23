@@ -50,86 +50,31 @@ const newUser = async (req, res) => {
   }
 };
 
-const newProfile = async (req, res) => {
-  const { username, lastname } = req.body;
-  const profile = await Profile.findOne({
-    control: username,
-    apellido: lastname,
-  });
+const activeProfile = async (req, res) => {
 
-  if (profile) {
-    return res.json({
-      msg: "Existe",
-      profile,
-    });
-  }
-
-  res.json({
-    msg: "No existe",
-  });
 };
 
-const newAlumnAccount = async (req, res) => {
-  try {
-    const { username } = req.body;
-    const existingProfile = await Profile.findOne({ control: username });
+const registerProfile = async (req, res) => {
+  const {
+    username,
+    nombre,
+    apellido_Paterno,
+    apellido_Materno,
+    sexo,
+    fecha_nacimiento,
+  } = req.body;
+  const profile = new Profile({
+    control: username,
+    nombre,
+    apellido_Paterno,
+    apellido_Materno,
+    sexo,
+    fecha_nacimiento,
+  });
 
-    if (existingProfile) {
-      res.status(400).json({
-        status: false,
-        message: "Profile is already activated.",
-      });
-    } else {
-      if (
-        !existingProfile.nombre.includes(req.body.name.toUpperCase()) ||
-        existingProfile.egreso.anio != req.body.egreso
-      ) {
-        console.log(
-          existingProfile.nombre +
-            " != " +
-            req.body.name.toUpperCase() +
-            " OR " +
-            existingProfile.egreso.anio +
-            "!=" +
-            req.body.egreso
-        );
-        return res.status(400).json({
-          status: false,
-          message: "Name or year does not match.",
-        });
-      }
+  await profile.save();
 
-      const existingAccount = await User.findOne({ username: username });
-      if (existingAccount) {
-        res.status(400).json({
-          status: false,
-          message: "Profile is already activated.",
-        });
-      } else {
-        const newUser = new User(req.body);
-        newUser.profileActivated = true;
-        newUser.name = existingProfile.nombre;
-
-        //  profile.update(...profileData);
-        //  profile.save();
-
-        newUser.profile = existingProfile._id;
-        newUser.save();
-
-        res.status(200).json({
-          status: true,
-          username: username,
-          profile: newProfile,
-        });
-      }
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      status: false,
-      message: "SERVER ERROR",
-    });
-  }
+  res.json({ profile });
 };
 
 const getRoles = async (req, res) => {
@@ -284,8 +229,8 @@ const updateProfile = async (req, res) => {
 module.exports = {
   newRole,
   newUser,
-  newProfile,
-  newAlumnAccount,
+  activeProfile,
+  registerProfile,
 
   getRoles,
   getUser,

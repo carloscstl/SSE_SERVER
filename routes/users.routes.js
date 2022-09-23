@@ -2,13 +2,13 @@ const { Router } = require("express");
 const { check } = require("express-validator");
 
 const {
-    newUser,
-    newProfile,
-    newAlumnAccount,
-    getUser,
-    getProfile,
-    getUsersByRole,
-    updateProfile,
+  newUser,
+  getUser,
+  getProfile,
+  getUsersByRole,
+  updateProfile,
+  registerProfile,
+  activeProfile,
 } = require("../controllers/users.controller");
 const { validateAdmin } = require("../middleware/data-validation.middleware");
 const { validateFields } = require("../middleware/validate-fields.middleware");
@@ -29,13 +29,12 @@ router.post(
   newUser
 );
 
-router.post("/activate", newProfile);
-
+router.post("/activate", activeProfile);
 
 router.post(
-  "/register",
+  "/register_profile",
   [check("username", "Username required.").not().isEmpty(), validateFields],
-  newAlumnAccount //!RENAME REGISTER_PROFILE
+  registerProfile
 );
 
 router.get("/profile/:user", getProfile);

@@ -9,7 +9,11 @@ const ProfileSchema = Schema({
     type: String,
     required: true,
   },
-  apellido: {
+  apellido_Paterno: {
+    type: String,
+    required: true,
+  },
+  apellido_Materno: {
     type: String,
     required: true,
   },
