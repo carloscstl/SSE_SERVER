@@ -17,9 +17,15 @@ const UserSchema = Schema({
         type: String,
         default: 'no-image.jpg' 
     },
-    permissions:[{
-        type:String
-    }]
+    role:{
+        type:String,
+        default:"user",
+        enum:["admin","user"]
+    },
+    permissions:{
+        type:[String],
+        required:true
+    }
 });
 
 UserSchema.method('toJSON', function(){

@@ -1,47 +1,36 @@
+const bcrypt = require("bcrypt");
+const { response } = require("express");
 const UserRole = require("../models/user_role");
 const User = require("../models/user");
 const Profile = require("../models/profile");
-const bcrypt = require("bcrypt");
-const { response } = require("express");
 
-const newRole = async (req, res) => {
+// *Create New User
+
+const createUser = async (req, res) => {
   try {
-    const role_name = req.body.role;
-    const exists = await UserRole.findOne({ role: role_name.toUpperCase() });
-    if (exists) {
-      res.status(400).json({
-        status: false,
-        message: "Role already exists.",
-      });
-    } else {
-      const newUserRole = new UserRole(req.body);
-      newUserRole.role = role_name.toUpperCase();
-      await newUserRole.save();
+    const { name, username, password, permissions = ["read"] } = req.body;
+    const existUser = await User.findOne({ username });
 
-      res.status(200).json({
-        status: true,
-        role: newUserRole,
-      });
-    }
-  } catch (error) {
-    res.status(500).json({
-      status: false,
-      message: "SERVER ERROR",
-    });
-  }
-};
-
-const newUser = async (req, res) => {
-  try {
-    const { username } = req.body;
-    const user = await User.findOne({ username });
-
-    if (user) {
+    if (existUser) {
       return res.status(400).json({
         status: false,
         message: "Username already exists.",
       });
     }
+
+    const user = new User({ name , username, password, permissions});
+
+    const salt = bcrypt.genSaltSync();
+    user.password = bcrypt.hashSync(password, salt);
+
+    await user.save();
+
+    res.json({
+      status:true,
+      msg:'User Created Succesfully',
+      user
+    });
+
   } catch (error) {
     res.status(500).json({
       status: false,
@@ -50,9 +39,7 @@ const newUser = async (req, res) => {
   }
 };
 
-const activeProfile = async (req, res) => {
-
-};
+// *REGISTER PROFILE
 
 const registerProfile = async (req, res) => {
   const {
@@ -62,7 +49,18 @@ const registerProfile = async (req, res) => {
     apellido_Materno,
     sexo,
     fecha_nacimiento,
+    ...data
   } = req.body;
+
+  const existProfile = await Profile.findOne({ control: username });
+
+  if (existProfile) {
+    return res.status(400).json({
+      status: false,
+      msg: "Profile Already Registered",
+    });
+  }
+
   const profile = new Profile({
     control: username,
     nombre,
@@ -70,28 +68,63 @@ const registerProfile = async (req, res) => {
     apellido_Materno,
     sexo,
     fecha_nacimiento,
+    ...data,
   });
 
   await profile.save();
 
-  res.json({ profile });
+  res.json({ status: true, msg: "Profile Registered Succesfully", profile });
 };
 
-const getRoles = async (req, res) => {
-  try {
-    const roles = await UserRole.find();
+// *ACTIVATE PROFILE
 
-    res.status(200).json({
-      status: true,
-      roles: roles,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
+const activateProfile = async (req, res) => {
+  const { username, password, apellido_Paterno } = req.body;
+
+  const userProfile = await Profile.findOne({
+    control: username,
+    apellido_Paterno,
+  });
+
+  if (!userProfile) {
+    return res.status(404).json({ status: false, error: "Profile Not Found" });
+  }
+
+  const existUser = await User.findOne({ username });
+
+  if (existUser) {
+    return res.status(400).json({
       status: false,
-      message: "SERVER ERROR",
+      msg: "User already Exist",
     });
   }
+
+  const user = new User({
+    name: userProfile.nombre,
+    username,
+    password,
+    permissions: ["read"],
+  });
+
+  const salt = bcrypt.genSaltSync();
+  user.password = bcrypt.hashSync(password, salt);
+
+  await user.save();
+
+  await Profile.updateOne(
+    {
+      control: username,
+      apellido_Paterno,
+    },
+    {
+      isActive: true,
+    }
+  );
+  res.json({
+    status: true,
+    msg: "User Activated Succesfully",
+    user,
+  });
 };
 
 const getUser = async (req, res) => {
@@ -125,30 +158,23 @@ const getUser = async (req, res) => {
 
 const getProfile = async (req, res) => {
   try {
-    const { user } = req.params;
-    console.log(user);
-    const existingUser = await User.findOne({ username: user })
-      .populate("role")
-      .populate("profile");
-    if (existingUser) {
-      if (existingUser.profileActivated) {
-        res.status(200).json({
-          status: true,
-          profile: existingUser.profile,
-        });
-      } else {
-        res.status(404).json({
-          status: false,
-          message: `Profile not activated.`,
-        });
-      }
-    } else {
-      console.log("DOES NOT EXIST");
-      res.status(404).json({
+
+    const {control} = req.params;
+    const profile = await Profile.findOne({control});
+
+    if(!profile){
+      return res.status(404).json({
         status: false,
-        message: `User ${user} does not exist.`,
+        msg:'Profile Not Found'
       });
     }
+
+    res.json({
+      status:true,
+      profile
+    });
+    
+    
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -227,12 +253,10 @@ const updateProfile = async (req, res) => {
 };
 
 module.exports = {
-  newRole,
-  newUser,
-  activeProfile,
+  createUser,
+  activateProfile,
   registerProfile,
 
-  getRoles,
   getUser,
   getProfile,
   getUsersByRole,
