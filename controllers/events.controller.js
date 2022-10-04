@@ -22,7 +22,6 @@ const newEvent = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
         serverError(res);
     }
 }
@@ -30,7 +29,6 @@ const newEvent = async (req, res) => {
 const getEventsByType = async (req, res) => {
 
     const { type } = req.params;
-    console.log('GETTING TYPE: ' + type);
     const page = Number(req.query.page) || 1;
 
     if (!eventTypes.includes(type.toUpperCase())) {
@@ -79,7 +77,6 @@ const getEvent = async (req, res) => {
                 message: 'Event not found.'
             });
         } else {
-            console.log(event.title);
             res.status(200).json({
                 status: true,
                 event
@@ -88,7 +85,6 @@ const getEvent = async (req, res) => {
 
 
     } catch (error) {
-        console.log(error);
         serverError(res);
     }
 }

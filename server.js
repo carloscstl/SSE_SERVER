@@ -26,8 +26,10 @@ class Server {
 
     this.app.use("/api/auth", require("./routes/auth.routes"));
     this.app.use("/api/users", require("./routes/users.routes"));
+    this.app.use("/api/profiles", require("./routes/profiles.routes"));
     this.app.use("/api/events", require("./routes/events.routes"));
     this.app.use("/api/uploads", require("./routes/uploads.routes"));
+    this.app.use("/api/careers", require("./routes/careers.routes"));
   }
 
   execute() {

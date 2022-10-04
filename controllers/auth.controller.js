@@ -24,8 +24,6 @@ const login = async (req, res) => {
         }
       );
 
-      console.log("token: " + token);
-
       res.status(200).json({
         status: true,
         user: user,
@@ -38,10 +36,8 @@ const login = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log(error);
     serverError(res);
   }
-  console.log(req.body);
 };
 
 const renewToken = async (req, res) => {
@@ -61,7 +57,6 @@ const renewToken = async (req, res) => {
       token: newToken,
     });
   } catch (error) {
-    console.log(error);
     serverError(res);
   }
 };

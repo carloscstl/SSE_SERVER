@@ -26,7 +26,8 @@ const ProfileSchema = Schema({
     required: true,
   },
   carrera:{
-    type:String,
+    type: Schema.Types.ObjectId,
+    ref: 'Career',
     required: true
   },
   ingreso: {
