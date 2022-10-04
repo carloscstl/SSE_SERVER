@@ -28,14 +28,22 @@ const registerCareer = async (req, res = response) => {
 };
 
 const getCareers = async (req, res = response) => {
-    const careers = await Career.find();
+  const { page = 1, limit = 10 } = req.query;
 
-    res.json({
-        careers
-    });
+  const [total, careers] = await Promise.all([
+    Career.countDocuments(),
+    Career.find()
+      .limit(limit)
+      .skip((page - 1) * limit),
+  ]);
+
+  res.json({
+    careers,
+    total
+  });
 };
 
 module.exports = {
   registerCareer,
-  getCareers
+  getCareers,
 };
