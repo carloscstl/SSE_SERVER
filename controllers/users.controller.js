@@ -63,44 +63,8 @@ const getUser = async (req, res = response) => {
   }
 };
 
-const getUsersByRole = async (req, res = response) => {
-  try {
-    const page = Number(req.query.page) || 1;
-
-    const { role } = req.params;
-
-    const existingRole = await UserRole.findOne({ role: role.toUpperCase() });
-
-    if (!existingRole) {
-      res.status(400).json({
-        status: false,
-        message: "Invalid Role.",
-      });
-    } else {
-      const usersTotal = await User.find({ role: existingRole._id });
-
-      const users = await User.find({ role: existingRole._id })
-        .skip((page - 1) * 20)
-        .limit(20);
-
-      res.status(200).json({
-        status: true,
-        users: users,
-        total: usersTotal.length,
-      });
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      status: false,
-      message: "SERVER ERROR",
-    });
-  }
-};
-
 module.exports = {
   createUser,
 
   getUser,
-  getUsersByRole,
 };

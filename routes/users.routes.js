@@ -1,11 +1,7 @@
 const { Router } = require("express");
 const { check } = require("express-validator");
 
-const {
-  createUser,
-  getUser,
-  getUsersByRole,
-} = require("../controllers/users.controller");
+const { createUser, getUser } = require("../controllers/users.controller");
 const { validateFields } = require("../middleware/validate-fields.middleware");
 // const { validateAdmin } = require("../middleware/data-validation.middleware");
 // const { validateJWT } = require("../middleware/jwt.middleware");
@@ -32,7 +28,5 @@ router.post(
 );
 
 router.get("/:user", getUser);
-
-router.get("/role/:role", getUsersByRole);
 
 module.exports = router;
