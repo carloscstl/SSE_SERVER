@@ -25,10 +25,28 @@ const ProfileSchema = Schema({
     type: Date,
     required: true,
   },
-  carrera:{
+  carrera: {
     type: Schema.Types.ObjectId,
-    ref: 'Career',
-    required: true
+    ref: "Career",
+    required: true,
+  },
+  location: {
+    type: {
+      lat: {
+        type: Number,
+        default: 21.13835514738178,
+        required: true,
+      },
+      lng: {
+        type: Number,
+        default: -86.83559983786421,
+        required: true,
+      },
+      color: {
+        type: String,
+        required: true,
+      },
+    },
   },
   ingreso: {
     type: {
@@ -50,10 +68,20 @@ const ProfileSchema = Schema({
       },
     },
   },
-  isActive:{
-    type:Boolean,
-    default: false
-  }
+  isActive: {
+    type: Boolean,
+    default: false,
+  },
+  aboutMe: {
+    type: String,
+  },
+  contact: {
+    type: {
+      phone: String,
+      email: String,
+      linkedIn: String,
+    },
+  },
 });
 
 ProfileSchema.method("toJSON", function () {

@@ -63,8 +63,29 @@ const getUser = async (req, res = response) => {
   }
 };
 
+
+const getUsersByRole = async (req,res=response) => {
+
+  const {role} = req.params;
+  const page = Number(req.query.page) || 1;
+
+  const total = await User.countDocuments();
+
+  const users = await User.find({
+    role
+  }).skip((page-1)*10).limit(10);
+
+  res.json({
+    status:true,
+    users,
+    total
+  });
+  
+};
+
+
 module.exports = {
   createUser,
-
   getUser,
+  getUsersByRole
 };

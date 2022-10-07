@@ -7,6 +7,7 @@ const {
   getProfile,
   getProfilesByCareer,
   updateProfile,
+  updateLocation,
 } = require("../controllers/profile.controller");
 
 const { validateFields } = require("../middleware/validate-fields.middleware");
@@ -52,12 +53,14 @@ router.post(
 
 router.get("/:control", getProfile);
 
-router.get("/career/:codigo_carrera", getProfilesByCareer); //? WIP
+router.get("/career/:codigo_carrera", getProfilesByCareer);
 
-router.put(
-  "/:id",
-  [check("id", "Id required.").not().isEmpty()],
-  updateProfile
-);
+router.patch("/:username", updateProfile);
+
+// router.patch("/location/:username",[
+//   check('lat','Latitud is required').not().isEmpty(),
+//   check('lng','Longitud is required').not().isEmpty(),
+//   check('color','Color is required').not().isEmpty(),
+// ], updateLocation);
 
 module.exports = router;

@@ -20,12 +20,12 @@ router.get('/all/:type', [
 
 router.put('/delete/:id', [
     validateJWT,
-    validateAdmin
+    // validateAdmin
 ],deactivateEvent);
 
 router.put('/update/:id', [
     validateJWT,
-    validateAdmin
+    // validateAdmi
 ],updateEvent);
 
 router.get('/:id', getEvent);

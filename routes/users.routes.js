@@ -29,4 +29,6 @@ router.post(
 
 router.get("/:user", getUser);
 
+router.get("/role/:role", getUsersByRole);
+
 module.exports = router;

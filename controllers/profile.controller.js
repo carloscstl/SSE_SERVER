@@ -51,6 +51,7 @@ const activateProfile = async (req, res = response) => {
     return res.status(404).json({ status: false, error: "Profile Not Found" });
   }
 
+  const profileId = userProfile._id;
   const existUser = await User.findOne({ username });
 
   if (existUser) {
@@ -64,6 +65,7 @@ const activateProfile = async (req, res = response) => {
     name: userProfile.nombre,
     username,
     password,
+    profileId,
     permissions: ["read"],
   });
 
@@ -113,8 +115,6 @@ const getProfile = async (req, res = response) => {
 };
 
 const getProfilesByCareer = async (req, res = response) => {
-  //?WIP
-
   const page = Number(req.query.page) || 1;
 
   let { codigo_carrera } = req.params;
@@ -133,7 +133,7 @@ const getProfilesByCareer = async (req, res = response) => {
   const profiles = await Profile.find({ carrera: careerId })
     .skip((page - 1) * 10)
     .limit(10);
-    
+
   res.json({
     profiles,
     page,
@@ -141,32 +141,76 @@ const getProfilesByCareer = async (req, res = response) => {
 };
 
 const updateProfile = async (req, res) => {
-  const updatedProfile = req.body;
-
-  const dbProfile = await Profile.findByIdAndUpdate(updatedProfile.id, {
-    ...updateProfile,
-  });
-
-  if (dbProfile) {
-    await dbProfile.save();
-    return res.status(201).json({
-      status: true,
-      message: "Profile updated",
-    });
-  }
-
-  res.status(400).json({
-    status: false,
-    message: "Profile not found",
-  });
+  const { username } = req.params;
+  const { contact, aboutMe } = req.body;
 
   try {
-  } catch (error) {
-    res.status(500).json({
+    const profileExists = await Profile.findOne({
+      control: username,
+      isActive: true,
+    });
+    if (!profileExists) {
+      return res.status(400).json({
+        status: false,
+        msg: "Profile not Found or Not active",
+      });
+    }
+    await Profile.updateOne(
+      {
+        control: username,
+      },
+      { contact, aboutMe }
+    );
+    res.json({
+      contact,
+      aboutMe,
+      username,
+    });
+  } catch (err) {
+    res.status(500).json({ status: false, msg: "Server Error", err });
+  }
+};
+
+const updateLocation = async (req, res = response) => {
+  const { color} = req.body;
+  const {username} = req.params
+  let { lat, lng } = req.body;
+
+  const profileExists = await Profile.find({
+    control: username,
+  });
+
+  if (!profileExists) {
+    return res.status(404).json({
       status: false,
-      message: "SERVER ERROR",
+      msg: "Profile Not Found",
     });
   }
+
+  // lat = Number(lat);
+  // lng = Number(lng);
+
+  // await Profile.updateOne(
+  //   {
+  //     control: username,
+  //   },
+  //   {
+  //     location: {
+  //       lat: lat,
+  //       lng: lng,
+  //       color,
+  //     },
+  //   }
+  // );
+
+  res.json({
+    status: true,
+    msg: "Location Added Succesfully",
+    username,
+    // profileExists,
+    lat,
+    lng,
+  });
 };
 
 module.exports = {
@@ -177,4 +221,5 @@ module.exports = {
   getProfilesByCareer,
 
   updateProfile,
+  updateLocation,
 };
